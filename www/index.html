@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Бібліотека Надійки</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="sky">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="star s1">⭐</div>
+    <div class="star s2">✨</div>
+    <div class="star s3">⭐</div>
+  </div>
+
+  <header class="app-header">
+    <h1>Надійчина бібліотека</h1>
+  </header>
+
+  <div id="exit-corner" class="exit-corner"></div>
+
+  <main id="content">
+
+    <section id="home" class="tab-panel active">
+      <img src="media/hero.png" alt="" class="hero-banner">
+      <div class="home-buttons">
+        <button class="home-btn pink" id="go-videos">
+          <span class="home-icon">🎬</span><span>Мультфільми</span>
+        </button>
+        <button class="home-btn blue" id="go-music">
+          <span class="home-icon">🎵</span><span>Музика</span>
+        </button>
+        <button class="home-btn green" id="go-add">
+          <span class="home-icon">➕</span><span>Додати файли</span>
+        </button>
+      </div>
+      <div class="status-line" id="status-line"></div>
+    </section>
+
+    <section id="videoCategories" class="tab-panel">
+      <button class="back-btn" data-back="home">⬅ Назад</button>
+      <div class="grid" id="categories-grid"></div>
+      <div class="empty-hint" id="categories-empty" style="display:none">
+        <p>Тут поки що порожньо 🌈</p>
+        <p class="small">Тисни «Додати файли» на головному екрані</p>
+      </div>
+    </section>
+
+    <section id="episodes" class="tab-panel">
+      <button class="back-btn" data-back="videoCategories">⬅ Назад</button>
+      <h2 class="section-title" id="episodes-title"></h2>
+      <div class="grid" id="episodes-grid"></div>
+    </section>
+
+    <section id="music" class="tab-panel">
+      <button class="back-btn" data-back="home">⬅ Назад</button>
+      <div class="grid" id="music-grid"></div>
+      <div class="empty-hint" id="music-empty" style="display:none">
+        <p>Тут поки що порожньо 🌈</p>
+        <p class="small">Тисни «Додати файли» на головному екрані</p>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="player-overlay" id="video-overlay">
+    <div class="player-box">
+      <button class="close-btn" id="close-video">✖</button>
+      <video id="video-player" controls playsinline></video>
+      <div class="now-playing" id="video-title"></div>
+    </div>
+  </div>
+
+  <div class="music-bar" id="music-bar">
+    <div class="music-cover">🎵</div>
+    <div class="music-info">
+      <div class="music-title" id="music-title">—</div>
+      <input type="range" id="music-seek" value="0" min="0" max="100">
+    </div>
+    <button class="music-btn" id="music-prev">⏮</button>
+    <button class="music-btn big" id="music-play">▶️</button>
+    <button class="music-btn" id="music-next">⏭</button>
+    <audio id="audio-player"></audio>
+  </div>
+
+  <!-- Вибір категорії для нового відео -->
+  <div class="modal-overlay" id="category-modal">
+    <div class="modal-box">
+      <p class="modal-title" id="category-modal-filename">Куди покласти цей мультик?</p>
+      <div class="category-list" id="category-modal-list"></div>
+      <div class="new-category-row">
+        <input type="text" id="new-category-input" placeholder="Назва нової категорії">
+        <button id="new-category-confirm">Створити</button>
+      </div>
+      <button class="modal-cancel" id="category-modal-cancel">Скасувати</button>
+    </div>
+  </div>
+
+  <div class="exit-overlay" id="exit-overlay">
+    <div class="exit-box">
+      <p>Вийти з додатку?</p>
+      <div class="exit-buttons">
+        <button id="exit-yes">Так, вийти</button>
+        <button id="exit-no">Ні, залишитись</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

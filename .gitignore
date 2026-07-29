@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Android build
+android/.gradle/
+android/build/
+android/app/build/
+
+# Capacitor
+android/app/release/
+android/app/debug/
+
+# Temporary
+temp_www/
+dist/
+
+# Archives
+*.zip
+
+# Logs
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Keystore
+*.jks
+*.keystore
+www/media/
+www/content.json

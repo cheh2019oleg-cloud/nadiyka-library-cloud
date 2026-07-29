@@ -1,0 +1,8 @@
+{
+  "appId": "com.getma.nadiykalibrary",
+  "appName": "Бібліотека Надійки",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": true
+  }
+}

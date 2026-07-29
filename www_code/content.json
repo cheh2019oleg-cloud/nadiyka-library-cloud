@@ -1,0 +1,480 @@
+﻿{
+    "videoCategories":  [
+                            {
+                                "title":  "Маша та Ведмідь",
+                                "episodes":  [
+                                                 {
+                                                     "file":  "media/videos/маша_та_ведмідь/Маша та Ведмідь 🎬🤩 1 сезон_ Усі серії 🤩🎬 Мультики для дітей 🎬 Збірник серій.mp4",
+                                                     "title":  "Маша та Ведмідь 🎬🤩 1 сезон  Усі серії 🤩🎬 Мультики для дітей 🎬 Збірник серій"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/маша_та_ведмідь/Маша та Ведмідь 🎬🤩 2 сезон_ Усі серії 🤩🎬 Мультики для дітей 🎬 Збірник серій.mp4",
+                                                     "title":  "Маша та Ведмідь 🎬🤩 2 сезон  Усі серії 🤩🎬 Мультики для дітей 🎬 Збірник серій"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/маша_та_ведмідь/Маша та Ведмідь 🎬🤩 3 сезон_ Усі серії 🤩🎬 Мультики для дітей 🎬 Добірка серій.mp4",
+                                                     "title":  "Маша та Ведмідь 🎬🤩 3 сезон  Усі серії 🤩🎬 Мультики для дітей 🎬 Добірка серій"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/маша_та_ведмідь/Маша та Ведмідь 👧🐻 Чому баранчик це не песик_ 🐑 Звуки тварин 🎬 Мультики для дітей.mp4",
+                                                     "title":  "Маша та Ведмідь 👧🐻 Чому баранчик це не песик  🐑 Звуки тварин 🎬 Мультики для дітей"
+                                                 }
+                                             ],
+                                "id":  "маша_та_ведмідь",
+                                "icon":  "🐻"
+                            },
+                            {
+                                "title":  "Радянські мультики",
+                                "episodes":  [
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback (1).mp4",
+                                                     "title":  "videoplayback (1)"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback (10).mp4",
+                                                     "title":  "videoplayback (10)"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback (2).mp4",
+                                                     "title":  "videoplayback (2)"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback (3).mp4",
+                                                     "title":  "videoplayback (3)"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback (4).mp4",
+                                                     "title":  "videoplayback (4)"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback (5).mp4",
+                                                     "title":  "videoplayback (5)"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback (6).mp4",
+                                                     "title":  "videoplayback (6)"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback (7).mp4",
+                                                     "title":  "videoplayback (7)"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback (8).mp4",
+                                                     "title":  "videoplayback (8)"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback (9).mp4",
+                                                     "title":  "videoplayback (9)"
+                                                 },
+                                                 {
+                                                     "file":  "media/videos/радянські_мультики/videoplayback.mp4",
+                                                     "title":  "videoplayback"
+                                                 }
+                                             ],
+                                "id":  "радянські_мультики",
+                                "icon":  "⭐"
+                            }
+                        ],
+    "music":  [
+                  {
+                      "file":  "media/music/__Gunpowder Rumba__ (1).mp3",
+                      "title":  "Gunpowder Rumba  (1)"
+                  },
+                  {
+                      "file":  "media/music/__Gunpowder Rumba__.mp3",
+                      "title":  "Gunpowder Rumba"
+                  },
+                  {
+                      "file":  "media/music/2_5305325147991870897.mp3",
+                      "title":  "2 5305325147991870897"
+                  },
+                  {
+                      "file":  "media/music/Accordion Laughter (1).mp3",
+                      "title":  "Accordion Laughter (1)"
+                  },
+                  {
+                      "file":  "media/music/Accordion Laughter.mp3",
+                      "title":  "Accordion Laughter"
+                  },
+                  {
+                      "file":  "media/music/Accordion Thunder (1).mp3",
+                      "title":  "Accordion Thunder (1)"
+                  },
+                  {
+                      "file":  "media/music/Accordion Thunder.mp3",
+                      "title":  "Accordion Thunder"
+                  },
+                  {
+                      "file":  "media/music/Barbed Harmony (1).mp3",
+                      "title":  "Barbed Harmony (1)"
+                  },
+                  {
+                      "file":  "media/music/Barbed Harmony.mp3",
+                      "title":  "Barbed Harmony"
+                  },
+                  {
+                      "file":  "media/music/Buben Revelry (1).mp3",
+                      "title":  "Buben Revelry (1)"
+                  },
+                  {
+                      "file":  "media/music/Buben Revelry.mp3",
+                      "title":  "Buben Revelry"
+                  },
+                  {
+                      "file":  "media/music/Cabbage Metronome (1).mp3",
+                      "title":  "Cabbage Metronome (1)"
+                  },
+                  {
+                      "file":  "media/music/Cabbage Metronome (2).mp3",
+                      "title":  "Cabbage Metronome (2)"
+                  },
+                  {
+                      "file":  "media/music/Cabbage Metronome.mp3",
+                      "title":  "Cabbage Metronome"
+                  },
+                  {
+                      "file":  "media/music/Chrome Citrus (1).mp3",
+                      "title":  "Chrome Citrus (1)"
+                  },
+                  {
+                      "file":  "media/music/Chrome Citrus.mp3",
+                      "title":  "Chrome Citrus"
+                  },
+                  {
+                      "file":  "media/music/Ginger Concrete (1).mp3",
+                      "title":  "Ginger Concrete (1)"
+                  },
+                  {
+                      "file":  "media/music/Ginger Concrete.mp3",
+                      "title":  "Ginger Concrete"
+                  },
+                  {
+                      "file":  "media/music/Iron Lantern (1).mp3",
+                      "title":  "Iron Lantern (1)"
+                  },
+                  {
+                      "file":  "media/music/Iron Lantern.mp3",
+                      "title":  "Iron Lantern"
+                  },
+                  {
+                      "file":  "media/music/Kelebek Gecesi (1).mp3",
+                      "title":  "Kelebek Gecesi (1)"
+                  },
+                  {
+                      "file":  "media/music/Kelebek Gecesi (2).mp3",
+                      "title":  "Kelebek Gecesi (2)"
+                  },
+                  {
+                      "file":  "media/music/Kelebek Gecesi.mp3",
+                      "title":  "Kelebek Gecesi"
+                  },
+                  {
+                      "file":  "media/music/Lacquered Silence (1).mp3",
+                      "title":  "Lacquered Silence (1)"
+                  },
+                  {
+                      "file":  "media/music/Lacquered Silence (2).mp3",
+                      "title":  "Lacquered Silence (2)"
+                  },
+                  {
+                      "file":  "media/music/Lacquered Silence (3).mp3",
+                      "title":  "Lacquered Silence (3)"
+                  },
+                  {
+                      "file":  "media/music/Lacquered Silence (4).mp3",
+                      "title":  "Lacquered Silence (4)"
+                  },
+                  {
+                      "file":  "media/music/Lacquered Silence (5).mp3",
+                      "title":  "Lacquered Silence (5)"
+                  },
+                  {
+                      "file":  "media/music/Lacquered Silence (6).mp3",
+                      "title":  "Lacquered Silence (6)"
+                  },
+                  {
+                      "file":  "media/music/Lacquered Silence.mp3",
+                      "title":  "Lacquered Silence"
+                  },
+                  {
+                      "file":  "media/music/Lazy Husband Gossip (1).mp3",
+                      "title":  "Lazy Husband Gossip (1)"
+                  },
+                  {
+                      "file":  "media/music/Lazy Husband Gossip.mp3",
+                      "title":  "Lazy Husband Gossip"
+                  },
+                  {
+                      "file":  "media/music/Madonna, Springsteen.mp3",
+                      "title":  "Madonna, Springsteen"
+                  },
+                  {
+                      "file":  "media/music/Madonna’s Gated Reverb (1).mp3",
+                      "title":  "Madonna’s Gated Reverb (1)"
+                  },
+                  {
+                      "file":  "media/music/Madonna’s Gated Reverb.mp3",
+                      "title":  "Madonna’s Gated Reverb"
+                  },
+                  {
+                      "file":  "media/music/Madonna’s Water House (1).mp3",
+                      "title":  "Madonna’s Water House (1)"
+                  },
+                  {
+                      "file":  "media/music/Madonna’s Water House.mp3",
+                      "title":  "Madonna’s Water House"
+                  },
+                  {
+                      "file":  "media/music/Nina__Sebastian_Schub___Sing_Like_Madonna__Visualiser__gaudiolab_vocal_high_quality_vocals.wav",
+                      "title":  "Nina Sebastian Schub Sing Like Madonna Visualiser gaudiolab vocal high quality vocals"
+                  },
+                  {
+                      "file":  "media/music/Sagte Reën (1).mp3",
+                      "title":  "Sagte Reën (1)"
+                  },
+                  {
+                      "file":  "media/music/Sagte Reën (2).mp3",
+                      "title":  "Sagte Reën (2)"
+                  },
+                  {
+                      "file":  "media/music/Sagte Reën.mp3",
+                      "title":  "Sagte Reën"
+                  },
+                  {
+                      "file":  "media/music/Saxophone Pencils (1).mp3",
+                      "title":  "Saxophone Pencils (1)"
+                  },
+                  {
+                      "file":  "media/music/Saxophone Pencils.mp3",
+                      "title":  "Saxophone Pencils"
+                  },
+                  {
+                      "file":  "media/music/Sebastian Schub - Sing Like Madonna (Visualiser)_gaudiolab_instrumental_high_quality.mp3",
+                      "title":  "Sebastian Schub - Sing Like Madonna (Visualiser) gaudiolab instrumental high quality"
+                  },
+                  {
+                      "file":  "media/music/Sebastian Schub - Sing Like Madonna (Visualiser)_gaudiolab_vocal_high_quality.mp3",
+                      "title":  "Sebastian Schub - Sing Like Madonna (Visualiser) gaudiolab vocal high quality"
+                  },
+                  {
+                      "file":  "media/music/sebastian_schub_-_sing_like_madonna_(z3.fm).mp3",
+                      "title":  "sebastian schub - sing like madonna (z3.fm)"
+                  },
+                  {
+                      "file":  "media/music/sebastian_schub__sing_like_madonna_z3_Female Warm Pop_combined_KITS.mp3",
+                      "title":  "sebastian schub sing like madonna z3 Female Warm Pop combined KITS"
+                  },
+                  {
+                      "file":  "media/music/Tina__Nina__Sebastian_Schub___Sing_Like_Madonna__Visualiser__gaudiolab_vocal_high_quality_vocals_vocals.wav",
+                      "title":  "Tina Nina Sebastian Schub Sing Like Madonna Visualiser gaudiolab vocal high quality vocals vocals"
+                  },
+                  {
+                      "file":  "media/music/Velvet Kettle (1).mp3",
+                      "title":  "Velvet Kettle (1)"
+                  },
+                  {
+                      "file":  "media/music/Velvet Kettle.mp3",
+                      "title":  "Velvet Kettle"
+                  },
+                  {
+                      "file":  "media/music/Артеме Артеме.mp3",
+                      "title":  "Артеме Артеме"
+                  },
+                  {
+                      "file":  "media/music/Артемів ключ.mp3",
+                      "title":  "Артемів ключ"
+                  },
+                  {
+                      "file":  "media/music/Баян на кухні.mp3",
+                      "title":  "Баян на кухні"
+                  },
+                  {
+                      "file":  "media/music/Благовест Терций.mp3",
+                      "title":  "Благовест Терций"
+                  },
+                  {
+                      "file":  "media/music/Верес_ Червоний Слід (1).mp3",
+                      "title":  "Верес  Червоний Слід (1)"
+                  },
+                  {
+                      "file":  "media/music/Верес_ Червоний Слід.mp3",
+                      "title":  "Верес  Червоний Слід"
+                  },
+                  {
+                      "file":  "media/music/Вітер П’є.mp3",
+                      "title":  "Вітер П’є"
+                  },
+                  {
+                      "file":  "media/music/Вороги, без страху.mp3",
+                      "title":  "Вороги, без страху"
+                  },
+                  {
+                      "file":  "media/music/Гроза По Руні.mp3",
+                      "title":  "Гроза По Руні"
+                  },
+                  {
+                      "file":  "media/music/Гроза Предків.mp3",
+                      "title":  "Гроза Предків"
+                  },
+                  {
+                      "file":  "media/music/ГРОЗА ЩИТІВ.mp3",
+                      "title":  "ГРОЗА ЩИТІВ"
+                  },
+                  {
+                      "file":  "media/music/Дма Корс - Я чекатиму (mp3dim.com).mp3",
+                      "title":  "Дма Корс - Я чекатиму (mp3dim.com)"
+                  },
+                  {
+                      "file":  "media/music/Зоряний садик (1).mp3",
+                      "title":  "Зоряний садик (1)"
+                  },
+                  {
+                      "file":  "media/music/Зоряний садик.mp3",
+                      "title":  "Зоряний садик"
+                  },
+                  {
+                      "file":  "media/music/Кицюня з долоні (1).mp3",
+                      "title":  "Кицюня з долоні (1)"
+                  },
+                  {
+                      "file":  "media/music/Кицюня з долоні (2).mp3",
+                      "title":  "Кицюня з долоні (2)"
+                  },
+                  {
+                      "file":  "media/music/Кицюня з долоні (3).mp3",
+                      "title":  "Кицюня з долоні (3)"
+                  },
+                  {
+                      "file":  "media/music/Кицюня з долоні.mp3",
+                      "title":  "Кицюня з долоні"
+                  },
+                  {
+                      "file":  "media/music/Котенятко Золотце (1).mp3",
+                      "title":  "Котенятко Золотце (1)"
+                  },
+                  {
+                      "file":  "media/music/Котенятко Золотце.mp3",
+                      "title":  "Котенятко Золотце"
+                  },
+                  {
+                      "file":  "media/music/Кров’ю викупив.mp3",
+                      "title":  "Кров’ю викупив"
+                  },
+                  {
+                      "file":  "media/music/Куплет 1_ (1).mp3",
+                      "title":  "Куплет 1  (1)"
+                  },
+                  {
+                      "file":  "media/music/Куплет 1_.mp3",
+                      "title":  "Куплет 1"
+                  },
+                  {
+                      "file":  "media/music/Луна Надії.mp3",
+                      "title":  "Луна Надії"
+                  },
+                  {
+                      "file":  "media/music/Мамин теплий Дім (1).mp3",
+                      "title":  "Мамин теплий Дім (1)"
+                  },
+                  {
+                      "file":  "media/music/Мамин теплий Дім.mp3",
+                      "title":  "Мамин теплий Дім"
+                  },
+                  {
+                      "file":  "media/music/Мурат Насыров - Я Это Ты.mp3",
+                      "title":  "Мурат Насыров - Я Это Ты"
+                  },
+                  {
+                      "file":  "media/music/Олег Гетманчук - Untitled 2026-05-10 21_55.m4a",
+                      "title":  "Олег Гетманчук - Untitled 2026-05-10 21 55"
+                  },
+                  {
+                      "file":  "media/music/Олег Гетманчук - Untitled 2026-05-10 22_04.m4a",
+                      "title":  "Олег Гетманчук - Untitled 2026-05-10 22 04"
+                  },
+                  {
+                      "file":  "media/music/Олег-Гетманчук-Untitled-2026-05-10-21_55.mp3",
+                      "title":  "Олег-Гетманчук-Untitled-2026-05-10-21 55"
+                  },
+                  {
+                      "file":  "media/music/Олег-Гетманчук-Untitled-2026-05-10-22_04.mp3",
+                      "title":  "Олег-Гетманчук-Untitled-2026-05-10-22 04"
+                  },
+                  {
+                      "file":  "media/music/Пам’ять Кольчуг (1).mp3",
+                      "title":  "Пам’ять Кольчуг (1)"
+                  },
+                  {
+                      "file":  "media/music/Пам’ять Кольчуг.mp3",
+                      "title":  "Пам’ять Кольчуг"
+                  },
+                  {
+                      "file":  "media/music/Помилуй мя.mp3",
+                      "title":  "Помилуй мя"
+                  },
+                  {
+                      "file":  "media/music/Свечи На Столе.mp3",
+                      "title":  "Свечи На Столе"
+                  },
+                  {
+                      "file":  "media/music/Секрет у серці.mp3",
+                      "title":  "Секрет у серці"
+                  },
+                  {
+                      "file":  "media/music/Сестричка Таня.mp3",
+                      "title":  "Сестричка Таня"
+                  },
+                  {
+                      "file":  "media/music/Сорок зірок нічі.mp3",
+                      "title":  "Сорок зірок нічі"
+                  },
+                  {
+                      "file":  "media/music/Спи, Надійо (1).mp3",
+                      "title":  "Спи, Надійо (1)"
+                  },
+                  {
+                      "file":  "media/music/Спи, Надійо.mp3",
+                      "title":  "Спи, Надійо"
+                  },
+                  {
+                      "file":  "media/music/Степова Клятва (1).mp3",
+                      "title":  "Степова Клятва (1)"
+                  },
+                  {
+                      "file":  "media/music/Степова Клятва.mp3",
+                      "title":  "Степова Клятва"
+                  },
+                  {
+                      "file":  "media/music/Теплі рукавички тітоньки.mp3",
+                      "title":  "Теплі рукавички тітоньки"
+                  },
+                  {
+                      "file":  "media/music/Теплі руки мами.mp3",
+                      "title":  "Теплі руки мами"
+                  },
+                  {
+                      "file":  "media/music/Тітонька Таня.mp3",
+                      "title":  "Тітонька Таня"
+                  },
+                  {
+                      "file":  "media/music/Уклін До Серця.mp3",
+                      "title":  "Уклін До Серця"
+                  },
+                  {
+                      "file":  "media/music/Шило в попі (1).mp3",
+                      "title":  "Шило в попі (1)"
+                  },
+                  {
+                      "file":  "media/music/Шило в попі.mp3",
+                      "title":  "Шило в попі"
+                  },
+                  {
+                      "file":  "media/music/Щебет Ржавчины (1).mp3",
+                      "title":  "Щебет Ржавчины (1)"
+                  },
+                  {
+                      "file":  "media/music/Щебет Ржавчины.mp3",
+                      "title":  "Щебет Ржавчины"
+                  }
+              ]
+}
