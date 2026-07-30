@@ -1,357 +1,640 @@
-// ==========================================================
-// Бібліотека Надійки — основна логіка
-// ==========================================================
 
-const VIDEO_EXT = ["mp4", "webm", "m4v", "mkv", "avi"];
-const AUDIO_EXT = ["mp3", "m4a", "aac", "wav", "ogg"];
-const STORAGE_DIR = "EXTERNAL"; // папка застосунку (не потребує особливих дозволів)
-const MEDIA_ROOT = "НадійкинаБібліотека";
 
-const P = () => window.Capacitor && window.Capacitor.Plugins;
+import Storage from "./modules/Storage.js";
+import Manifest from "./modules/Manifest.js";
+import CloudSync from "./modules/CloudSync.js";
+import DownloadManager from "./modules/DownloadManager.js";
+import LibraryManager from "./modules/LibraryManager.js";
+import Player from "./modules/Player.js";
+import UI from "./modules/UI.js";
 
-let library = { categories: [], music: [] };
-// library.categories: [{ title, icon, episodes: [{ title, path }] }]
-// library.music: [{ title, path }]
+const VIDEO_EXT = ["mp4","webm","mkv","avi","m4v"];
+const AUDIO_EXT = ["mp3","wav","aac","ogg","m4a"];
 
-let resumeMap = {};
-let currentAudioIndex = 0;
-let pendingFilesQueue = []; // черга відео-файлів, що чекають вибору категорії
+let library = {
+    categories: [],
+    music: []
+};
 
-const screens = ["home", "videoCategories", "episodes", "music"];
-function showScreen(id) {
-  screens.forEach(s => document.getElementById(s).classList.toggle("active", s === id));
-}
-
-function extOf(name) {
-  const i = name.lastIndexOf(".");
-  return i === -1 ? "" : name.slice(i + 1).toLowerCase();
-}
-function titleFromFilename(name) {
-  const i = name.lastIndexOf(".");
-  const base = i === -1 ? name : name.slice(0, i);
-  return base.replace(/[_]+/g, " ").trim();
-}
-function safeName(name) {
-  return name.replace(/[\\/:*?"<>|]/g, "_");
-}
-function showToast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2200);
-}
-
-// ---------- Вбудований (зашитий у apk) контент ----------
-async function loadBundledContent() {
-  try {
-    const res = await fetch("content.json");
-    if (!res.ok) return { videoCategories: [], music: [] };
-    return await res.json();
-  } catch (e) {
-    return { videoCategories: [], music: [] };
-  }
-}
-
-// ---------- Збереження бібліотеки (те, що додано кнопкою "Додати файли") ----------
-async function loadLibrary() {
-  let added = { categories: [], music: [] };
-  try {
-    const { Preferences } = P();
-    const lib = await Preferences.get({ key: "library" });
-    const res = await Preferences.get({ key: "resumeMap" });
-    added = lib.value ? JSON.parse(lib.value) : { categories: [], music: [] };
-    resumeMap = res.value ? JSON.parse(res.value) : {};
-  } catch (e) {
-    resumeMap = {};
-  }
-
-  const bundled = await loadBundledContent();
-  const bundledCategories = (bundled.videoCategories || []).map(cat => ({
-    title: cat.title,
-    icon: cat.icon || "🎬",
-    bundled: true,
-    episodes: (cat.episodes || []).map(ep => ({ title: ep.title, path: ep.file, bundled: true }))
-  }));
-  const bundledMusic = (bundled.music || []).map(m => ({ title: m.title, path: m.file, bundled: true }));
-
-  // Об'єднуємо: вбудовані категорії + ті, що додані кнопкою (без дублів за назвою)
-  const merged = [...bundledCategories];
-  (added.categories || []).forEach(addedCat => {
-    const existing = merged.find(c => c.title === addedCat.title);
-    if (existing) existing.episodes.push(...addedCat.episodes);
-    else merged.push(addedCat);
-  });
-
-  library = {
-    categories: merged,
-    music: [...bundledMusic, ...(added.music || [])]
-  };
-}
-async function saveLibrary() {
-  try {
-    const { Preferences } = P();
-    await Preferences.set({ key: "library", value: JSON.stringify(library) });
-  } catch (e) { /* ignore */ }
-}
-async function saveResumeMap() {
-  try {
-    const { Preferences } = P();
-    await Preferences.set({ key: "resumeMap", value: JSON.stringify(resumeMap) });
-  } catch (e) { /* ignore */ }
-}
-
-// ---------- Рендер ----------
-function renderCategories() {
-  const grid = document.getElementById("categories-grid");
-  const empty = document.getElementById("categories-empty");
-  grid.innerHTML = "";
-  empty.style.display = library.categories.length ? "none" : "block";
-  library.categories.forEach(cat => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `<div class="thumb">${cat.icon || "🎬"}</div><div class="label">${cat.title}</div>`;
-    card.addEventListener("click", () => openCategory(cat));
-    grid.appendChild(card);
-  });
-}
-
+let manifest = null;
 let currentCategory = null;
-function openCategory(cat) {
-  currentCategory = cat;
-  document.getElementById("episodes-title").textContent = cat.title;
-  const grid = document.getElementById("episodes-grid");
-  grid.innerHTML = "";
-  cat.episodes.forEach(ep => {
-    const card = document.createElement("div");
-    card.className = "card";
-    const hasResume = resumeMap[ep.path] && resumeMap[ep.path] > 5;
-    card.innerHTML = `<div class="thumb">🎬</div><div class="label">${ep.title}</div>${hasResume ? '<div class="resume-badge">Продовжити</div>' : ''}`;
-    card.addEventListener("click", () => playVideo(ep));
-    grid.appendChild(card);
-  });
-  showScreen("episodes");
+let currentAudioIndex = 0;
+let resumeMap = {};
+let pendingFilesQueue = [];
+
+const screens = [
+    "home",
+    "videoCategories",
+    "episodes",
+    "music"
+];
+
+function P(){
+    return window.Capacitor?.Plugins;
 }
 
-async function fileSrc(relativePath) {
-  const { Filesystem } = P();
-  const { uri } = await Filesystem.getUri({ path: relativePath, directory: STORAGE_DIR });
-  return window.Capacitor.convertFileSrc(uri);
+function extOf(name){
+    const i=name.lastIndexOf(".");
+    if(i===-1) return "";
+    return name.substring(i+1).toLowerCase();
 }
 
-async function playVideo(ep) {
-  const overlay = document.getElementById("video-overlay");
-  const player = document.getElementById("video-player");
-  document.getElementById("video-title").textContent = ep.title;
-  player.src = ep.bundled ? ep.path : await fileSrc(ep.path);
-  overlay.classList.add("open");
-  const resumeAt = resumeMap[ep.path];
-  if (resumeAt && resumeAt > 5) {
-    player.addEventListener("loadedmetadata", function once() {
-      player.currentTime = resumeAt;
-      player.removeEventListener("loadedmetadata", once);
-    });
-  }
-  player.play().catch(() => {});
-  player._currentPath = ep.path;
-}
-document.getElementById("video-player").addEventListener("timeupdate", (e) => {
-  const p = e.target;
-  if (p._currentPath && p.currentTime > 0) resumeMap[p._currentPath] = p.currentTime;
-});
-document.getElementById("close-video").addEventListener("click", () => {
-  const overlay = document.getElementById("video-overlay");
-  const player = document.getElementById("video-player");
-  player.pause();
-  player.src = "";
-  overlay.classList.remove("open");
-  saveResumeMap();
-  renderCategories();
-  if (currentCategory) openCategory(currentCategory);
-});
-
-function renderMusic() {
-  const grid = document.getElementById("music-grid");
-  const empty = document.getElementById("music-empty");
-  grid.innerHTML = "";
-  empty.style.display = library.music.length ? "none" : "block";
-  library.music.forEach((song, i) => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `<div class="thumb">🎵</div><div class="label">${song.title}</div>`;
-    card.addEventListener("click", () => playMusic(i));
-    grid.appendChild(card);
-  });
+function titleFromFilename(name){
+    const i=name.lastIndexOf(".");
+    return (i==-1?name:name.substring(0,i))
+        .replace(/_/g," ")
+        .trim();
 }
 
-const audio = document.getElementById("audio-player");
-const seek = document.getElementById("music-seek");
-const playBtn = document.getElementById("music-play");
-
-async function playMusic(index) {
-  if (!library.music.length) return;
-  currentAudioIndex = (index + library.music.length) % library.music.length;
-  const song = library.music[currentAudioIndex];
-  audio.src = song.bundled ? song.path : await fileSrc(song.path);
-  document.getElementById("music-title").textContent = song.title;
-  audio.play().catch(() => {});
-  playBtn.textContent = "⏸";
-}
-playBtn.addEventListener("click", () => {
-  if (!audio.src) return;
-  if (audio.paused) { audio.play(); playBtn.textContent = "⏸"; }
-  else { audio.pause(); playBtn.textContent = "▶️"; }
-});
-document.getElementById("music-next").addEventListener("click", () => playMusic(currentAudioIndex + 1));
-document.getElementById("music-prev").addEventListener("click", () => playMusic(currentAudioIndex - 1));
-audio.addEventListener("ended", () => playMusic(currentAudioIndex + 1));
-audio.addEventListener("timeupdate", () => { if (audio.duration) seek.value = (audio.currentTime / audio.duration) * 100; });
-seek.addEventListener("input", () => { if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration; });
-
-// ---------- Навігація ----------
-document.getElementById("go-videos").addEventListener("click", () => showScreen("videoCategories"));
-document.getElementById("go-music").addEventListener("click", () => showScreen("music"));
-document.querySelectorAll(".back-btn").forEach(btn => {
-  btn.addEventListener("click", () => showScreen(btn.dataset.back));
-});
-
-// ---------- Додавання файлів ----------
-document.getElementById("go-add").addEventListener("click", pickFiles);
-
-async function pickFiles() {
-  const { FilePicker } = P();
-  if (!FilePicker) {
-    showToast("Плагін вибору файлів не підключено");
-    return;
-  }
-  try {
-    const result = await FilePicker.pickFiles({ multiple: true, readData: false });
-    const files = result.files || [];
-    if (!files.length) return;
-
-    const videos = [];
-    for (const f of files) {
-      const ext = extOf(f.name);
-      if (AUDIO_EXT.includes(ext)) {
-        await addMusicFile(f);
-      } else if (VIDEO_EXT.includes(ext)) {
-        videos.push(f);
-      } else {
-        showToast(`Пропущено (незнайомий формат): ${f.name}`);
-      }
-    }
-    if (videos.length) {
-      pendingFilesQueue = videos;
-      askCategoryForNext();
-    } else {
-      renderMusic();
-      saveLibrary();
-    }
-  } catch (e) {
-    console.warn("Вибір файлів скасовано або сталась помилка", e);
-  }
+function safeName(name){
+    return name.replace(/[\\/:*?"<>|]/g,"_");
 }
 
-async function addMusicFile(pickedFile) {
-  const { Filesystem } = P();
-  const destPath = `${MEDIA_ROOT}/Музика/${safeName(pickedFile.name)}`;
-  try {
-    await Filesystem.copy({ from: pickedFile.path, to: destPath, toDirectory: STORAGE_DIR });
-  } catch (e) {
-    // якщо шлях у форматі content:// copy може вимагати трохи іншого підходу — див. README
-    console.warn("Не вдалося скопіювати аудіо", e);
-    showToast(`Помилка копіювання: ${pickedFile.name}`);
-    return;
-  }
-  library.music.push({ title: titleFromFilename(pickedFile.name), path: destPath });
-  showToast(`Додано в Музику: ${titleFromFilename(pickedFile.name)}`);
-}
+async function initialize(){
 
-function askCategoryForNext() {
-  if (!pendingFilesQueue.length) {
-    saveLibrary();
+    UI.init();
+
+    await Storage.init();
+
+    resumeMap = await Storage.loadResume();
+
+    library = await LibraryManager.loadLibrary();
+
+    manifest = await Manifest.load();
+
+    await CloudSync.initialize();
+
     renderCategories();
+
     renderMusic();
-    return;
-  }
-  const nextFile = pendingFilesQueue[0];
-  document.getElementById("category-modal-filename").textContent = `Куди покласти «${titleFromFilename(nextFile.name)}»?`;
-  const list = document.getElementById("category-modal-list");
-  list.innerHTML = "";
-  library.categories.forEach(cat => {
-    const btn = document.createElement("button");
-    btn.textContent = `${cat.icon || "🎬"} ${cat.title}`;
-    btn.addEventListener("click", () => addVideoToCategory(nextFile, cat.title));
-    list.appendChild(btn);
-  });
-  document.getElementById("new-category-input").value = "";
-  document.getElementById("category-modal").classList.add("open");
+
+    updateStatus();
+
 }
 
-document.getElementById("new-category-confirm").addEventListener("click", () => {
-  const name = document.getElementById("new-category-input").value.trim();
-  if (!name) { showToast("Введи назву категорії"); return; }
-  const nextFile = pendingFilesQueue[0];
-  addVideoToCategory(nextFile, name);
-});
+function updateStatus(){
 
-document.getElementById("category-modal-cancel").addEventListener("click", () => {
-  pendingFilesQueue.shift();
-  document.getElementById("category-modal").classList.remove("open");
-  askCategoryForNext();
-});
+    document.getElementById("status-line").textContent=
+        `Категорій: ${library.categories.length} | Музика: ${library.music.length}`;
 
-async function addVideoToCategory(pickedFile, categoryTitle) {
-  const { Filesystem } = P();
-  let cat = library.categories.find(c => c.title === categoryTitle);
-  if (!cat) {
-    cat = { title: categoryTitle, icon: "🎬", episodes: [] };
-    library.categories.push(cat);
-  }
-  const destPath = `${MEDIA_ROOT}/Мультфільми/${safeName(categoryTitle)}/${safeName(pickedFile.name)}`;
-  try {
-    await Filesystem.copy({ from: pickedFile.path, to: destPath, toDirectory: STORAGE_DIR });
-    cat.episodes.push({ title: titleFromFilename(pickedFile.name), path: destPath });
-    showToast(`Додано в «${categoryTitle}»: ${titleFromFilename(pickedFile.name)}`);
-  } catch (e) {
-    console.warn("Не вдалося скопіювати відео", e);
-    showToast(`Помилка копіювання: ${pickedFile.name}`);
-  }
-  document.getElementById("category-modal").classList.remove("open");
-  pendingFilesQueue.shift();
-  askCategoryForNext();
 }
 
-// ---------- Захист від виходу ----------
-let exitPressTimer = null;
-const exitCorner = document.getElementById("exit-corner");
-const exitOverlay = document.getElementById("exit-overlay");
-function startExitPress() { exitPressTimer = setTimeout(() => exitOverlay.classList.add("open"), 3000); }
-function cancelExitPress() { if (exitPressTimer) clearTimeout(exitPressTimer); }
-exitCorner.addEventListener("touchstart", startExitPress);
-exitCorner.addEventListener("touchend", cancelExitPress);
-exitCorner.addEventListener("mousedown", startExitPress);
-exitCorner.addEventListener("mouseup", cancelExitPress);
-document.getElementById("exit-no").addEventListener("click", () => exitOverlay.classList.remove("open"));
-document.getElementById("exit-yes").addEventListener("click", () => {
-  try { P().App.exitApp(); } catch (e) { /* ignore */ }
+function showScreen(id){
+
+    screens.forEach(screen=>{
+
+        document
+            .getElementById(screen)
+            .classList
+            .toggle("active",screen===id);
+
+    });
+
+}
+
+function renderCategories(){
+
+    const grid=document.getElementById("categories-grid");
+
+    grid.innerHTML="";
+
+    if(!library.categories.length){
+
+        document.getElementById("categories-empty").style.display="block";
+        return;
+
+    }
+
+    document.getElementById("categories-empty").style.display="none";
+
+    library.categories.forEach(category=>{
+
+        const card=document.createElement("div");
+
+        card.className="card";
+
+        card.innerHTML=`
+            <div class="thumb">${category.icon||"🎬"}</div>
+            <div class="label">${category.title}</div>
+        `;
+
+        card.onclick=()=>openCategory(category);
+
+        grid.appendChild(card);
+
+    });
+
+}
+
+function openCategory(category){
+
+    currentCategory=category;
+
+    document.getElementById("episodes-title").textContent=category.title;
+
+    const grid=document.getElementById("episodes-grid");
+
+    grid.innerHTML="";
+
+    category.episodes.forEach(episode=>{
+
+        const resume=resumeMap[episode.path]||0;
+
+        const card=document.createElement("div");
+
+        card.className="card";
+
+        card.innerHTML=`
+            <div class="thumb">🎬</div>
+            <div class="label">${episode.title}</div>
+            ${
+                resume>5
+                ?'<div class="resume-badge">▶ Продовжити</div>'
+                :""
+            }
+        `;
+
+        card.onclick=()=>playVideo(episode);
+
+        grid.appendChild(card);
+
+    });
+
+    showScreen("episodes");
+
+}
+
+async function playVideo(video){
+
+    await Player.playVideo(video,resumeMap);
+
+}
+
+async function renderMusic(){
+
+    const grid=document.getElementById("music-grid");
+
+    grid.innerHTML="";
+
+    if(!library.music.length){
+
+        document.getElementById("music-empty").style.display="block";
+        return;
+
+    }
+
+    document.getElementById("music-empty").style.display="none";
+
+    library.music.forEach((song,index)=>{
+
+        const card=document.createElement("div");
+
+        card.className="card";
+
+        card.innerHTML=`
+            <div class="thumb">🎵</div>
+            <div class="label">${song.title}</div>
+        `;
+
+        card.onclick=()=>playMusic(index);
+
+        grid.appendChild(card);
+
+    });
+
+}
+async function playMusic(index){
+
+    if(!library.music.length) return;
+
+    currentAudioIndex=index;
+
+    const song=library.music[index];
+
+    await Player.playMusic(song);
+
+    UI.setMusicTitle(song.title);
+
+}
+
+document
+.getElementById("music-play")
+.onclick=()=>Player.toggleMusic();
+
+document
+.getElementById("music-next")
+.onclick=()=>{
+
+    currentAudioIndex++;
+
+    if(currentAudioIndex>=library.music.length)
+        currentAudioIndex=0;
+
+    playMusic(currentAudioIndex);
+
+};
+
+document
+.getElementById("music-prev")
+.onclick=()=>{
+
+    currentAudioIndex--;
+
+    if(currentAudioIndex<0)
+        currentAudioIndex=library.music.length-1;
+
+    playMusic(currentAudioIndex);
+
+};
+
+document
+.getElementById("go-videos")
+.onclick=()=>showScreen("videoCategories");
+
+document
+.getElementById("go-music")
+.onclick=()=>showScreen("music");
+
+document
+.querySelectorAll(".back-btn")
+.forEach(button=>{
+
+    button.onclick=()=>{
+
+        showScreen(button.dataset.back);
+
+    };
+
 });
 
-try {
-  P().App.addListener("backButton", () => {
-    const activeScreen = screens.find(s => document.getElementById(s).classList.contains("active"));
-    if (activeScreen === "home") exitOverlay.classList.add("open");
-    else if (activeScreen === "episodes") showScreen("videoCategories");
-    else showScreen("home");
-  });
-} catch (e) { /* браузерний перегляд без Capacitor */ }
+document
+.getElementById("close-video")
+.onclick=async()=>{
 
-// ---------- Старт ----------
-(async function init() {
-  await loadLibrary();
-  renderCategories();
-  renderMusic();
-  document.getElementById("status-line").textContent =
-    (library.categories.length || library.music.length)
-      ? `Категорій: ${library.categories.length}, пісень: ${library.music.length}`
-      : "Поки що порожньо — тисни «Додати файли»";
-})();
+    await Player.stopVideo();
+
+    resumeMap=Player.getResume();
+
+    await Storage.saveResume(resumeMap);
+
+    if(currentCategory)
+        openCategory(currentCategory);
+
+};
+
+document
+.getElementById("go-add")
+.onclick=pickFiles;
+
+async function pickFiles(){
+
+    const picker=P().FilePicker;
+
+    if(!picker){
+
+        UI.showToast("FilePicker не встановлено");
+
+        return;
+
+    }
+
+    try{
+
+        const result=await picker.pickFiles({
+
+            multiple:true,
+            readData:false
+
+        });
+
+        if(!result.files.length)
+            return;
+
+        const videos=[];
+
+        for(const file of result.files){
+
+            const ext=extOf(file.name);
+
+            if(AUDIO_EXT.includes(ext)){
+
+                await addMusic(file);
+
+            }
+
+            else if(VIDEO_EXT.includes(ext)){
+
+                videos.push(file);
+
+            }
+
+        }
+
+        pendingFilesQueue=videos;
+
+        askCategory();
+
+        renderMusic();
+
+        renderCategories();
+
+    }
+
+    catch(e){
+
+        console.error(e);
+
+    }
+
+}
+
+async function addMusic(file){
+
+    await LibraryManager.addMusic(file);
+
+    library=await LibraryManager.loadLibrary();
+
+    UI.showToast("Додано: "+titleFromFilename(file.name));
+
+}
+
+function askCategory(){
+
+    if(!pendingFilesQueue.length){
+
+        LibraryManager.save();
+
+        renderCategories();
+
+        return;
+
+    }
+
+    const file=pendingFilesQueue[0];
+
+    const modal=document.getElementById("category-modal");
+
+    document
+        .getElementById("category-modal-filename")
+        .textContent=file.name;
+
+    const list=document.getElementById("category-modal-list");
+
+    list.innerHTML="";
+
+    library.categories.forEach(category=>{
+
+        const btn=document.createElement("button");
+
+        btn.textContent=category.title;
+
+        btn.onclick=()=>{
+
+            addVideo(file,category.title);
+
+        };
+
+        list.appendChild(btn);
+
+    });
+
+    modal.classList.add("open");
+
+}
+async function addVideo(file, categoryTitle){
+
+    const modal=document.getElementById("category-modal");
+
+    modal.classList.remove("open");
+
+    await LibraryManager.addVideo(
+        file,
+        categoryTitle
+    );
+
+    library=await LibraryManager.loadLibrary();
+
+    pendingFilesQueue.shift();
+
+    renderCategories();
+
+    if(pendingFilesQueue.length){
+
+        askCategory();
+
+    }
+
+    else{
+
+        UI.showToast("Всі файли додано");
+
+    }
+
+}
+
+document
+.getElementById("new-category-confirm")
+.onclick=()=>{
+
+    const input=document
+        .getElementById("new-category-input");
+
+    const name=input.value.trim();
+
+    if(!name){
+
+        UI.showToast("Введіть назву");
+
+        return;
+
+    }
+
+    addVideo(
+        pendingFilesQueue[0],
+        name
+    );
+
+};
+
+document
+.getElementById("category-modal-cancel")
+.onclick=()=>{
+
+    pendingFilesQueue.shift();
+
+    document
+        .getElementById("category-modal")
+        .classList
+        .remove("open");
+
+    if(pendingFilesQueue.length){
+
+        askCategory();
+
+    }
+
+};
+
+async function syncCloud(){
+
+    UI.showLoading("Перевірка оновлень...");
+
+    try{
+
+        const result=await CloudSync.sync();
+
+        if(result.updated){
+
+            library=await LibraryManager.loadLibrary();
+
+            renderCategories();
+
+            renderMusic();
+
+            UI.showToast(
+                "Бібліотеку оновлено"
+            );
+
+        }
+
+        else{
+
+            UI.showToast(
+                "Оновлень немає"
+            );
+
+        }
+
+    }
+
+    catch(e){
+
+        console.error(e);
+
+        UI.showToast(
+            "Помилка синхронізації"
+        );
+
+    }
+
+    UI.hideLoading();
+
+}
+
+window.addEventListener(
+
+    "online",
+
+    ()=>{
+
+        syncCloud();
+
+    }
+
+);
+
+document
+.getElementById("music-seek")
+.addEventListener(
+
+    "input",
+
+    e=>{
+
+        Player.seek(
+
+            e.target.value
+
+        );
+
+    }
+
+);
+
+window.addEventListener(
+
+    "beforeunload",
+
+    async()=>{
+
+        await Storage.saveResume(
+
+            Player.getResume()
+
+        );
+
+    }
+
+);
+
+try{
+
+    P().App.addListener(
+
+        "backButton",
+
+        ()=>{
+
+            const active=document.querySelector(
+                ".tab-panel.active"
+            );
+
+            if(active.id==="episodes"){
+
+                showScreen(
+                    "videoCategories"
+                );
+
+                return;
+
+            }
+
+            if(active.id==="videoCategories"){
+
+                showScreen("home");
+
+                return;
+
+            }
+
+            document
+            .getElementById("exit-overlay")
+            .classList
+            .add("open");
+
+        }
+
+    );
+
+}
+catch(e){}
+
+document
+.getElementById("exit-no")
+.onclick=()=>{
+
+    document
+        .getElementById("exit-overlay")
+        .classList
+        .remove("open");
+
+};
+
+document
+.getElementById("exit-yes")
+.onclick=()=>{
+
+    try{
+
+        P().App.exitApp();
+
+    }
+    catch(e){}
+
+};
+
+initialize();
+
+console.log(
+    "Надійчина бібліотека V2 запущена"
+);
