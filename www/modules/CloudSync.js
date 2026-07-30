@@ -1,125 +1,78 @@
-const MANIFEST_URL =
-"https://raw.githubusercontent.com/cheh2019oleg-cloud/nadiyka-library-cloud/main/manifest.json";
+import Manifest from "./Manifest.js";
+import LibraryManager from "./LibraryManager.js";
 
-export default {
+export default class CloudSync {
 
-    manifest:null,
+    static async initialize() {
 
-    async initialize(){
-
-        try{
-
-            await this.loadManifest();
-
-        }
-
-        catch(e){
-
-            console.error(e);
-
-        }
-
-    },
-
-    async loadManifest(){
-
-        const response=await fetch(
-
-            MANIFEST_URL,
-
-            {
-
-                cache:"no-cache"
-
-            }
-
-        );
-
-        if(!response.ok){
-
-            throw new Error(
-                "Не вдалося завантажити manifest"
-            );
-
-        }
-
-        this.manifest=
-            await response.json();
-
-        return this.manifest;
-
-    },
-
-    async sync(){
-
-        const remote=
-            await this.loadManifest();
-
-        let localVersion=1;
-
-        try{
-
-            localVersion=parseInt(
-
-                localStorage.getItem(
-                    "manifestVersion"
-                )||"1"
-
-            );
-
-        }
-
-        catch(e){}
-
-        if(remote.version<=localVersion){
-
-            return{
-
-                updated:false,
-
-                manifest:remote
-
-            };
-
-        }
-
-        localStorage.setItem(
-
-            "manifestVersion",
-
-            remote.version
-
-        );
-
-        return{
-
-            updated:true,
-
-            manifest:remote
-
-        };
-
-    },
-
-    async getManifest(){
-
-        if(!this.manifest){
-
-            await this.loadManifest();
-
-        }
-
-        return this.manifest;
-
-    },
-
-    async getVersion(){
-
-        const m=
-            await this.getManifest();
-
-        return m.version||1;
+        return await this.sync(false);
 
     }
 
-};
+    static async sync(showLog = true) {
+
+        const cloud = await Manifest.load();
+
+        const local = await LibraryManager.loadLibrary();
+
+        let updated = false;
+
+        if (cloud.categories) {
+
+            cloud.categories.forEach(category => {
+
+                const exists = local.categories.find(c => c.title === category.title);
+
+                if (!exists) {
+
+                    local.categories.push(category);
+
+                    updated = true;
+
+                }
+
+            });
+
+        }
+
+        if (cloud.music) {
+
+            cloud.music.forEach(song => {
+
+                const exists = local.music.find(m => m.title === song.title);
+
+                if (!exists) {
+
+                    local.music.push(song);
+
+                    updated = true;
+
+                }
+
+            });
+
+        }
+
+        if (updated) {
+
+            await LibraryManager.saveLibrary(local);
+
+        }
+
+        if (showLog) {
+
+            console.log("Cloud Sync:", updated ? "UPDATED" : "NO UPDATES");
+
+        }
+
+        return {
+
+            updated,
+
+            manifest: cloud
+
+        };
+
+    }
+
+}

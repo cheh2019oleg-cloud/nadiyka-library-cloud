@@ -1,51 +1,35 @@
 import Storage from "./Storage.js";
 
-let library = {
-    categories: [],
-    music: []
-};
+export default class LibraryManager {
 
-export default {
+    static async loadLibrary() {
 
-    async loadLibrary() {
+        let lib = await Storage.get("library");
 
-        library = await Storage.loadLibrary();
+        if (!lib) {
 
-        if (!library.categories)
-            library.categories = [];
+            lib = {
+                categories: [],
+                music: []
+            };
 
-        if (!library.music)
-            library.music = [];
+            await Storage.set("library", lib);
 
-        return library;
+        }
 
-    },
+        return lib;
 
-    async save() {
+    }
 
-        await Storage.saveLibrary(library);
+    static async saveLibrary(library) {
 
-    },
+        await Storage.set("library", library);
 
-    async addMusic(file) {
+    }
 
-        const item = {
+    static async addVideo(file, categoryTitle) {
 
-            title: this.fileTitle(file.name),
-
-            path: file.path,
-
-            type: "music"
-
-        };
-
-        library.music.push(item);
-
-        await this.save();
-
-    },
-
-    async addVideo(file, categoryTitle) {
+        const library = await this.loadLibrary();
 
         let category = library.categories.find(
             c => c.title === categoryTitle
@@ -54,13 +38,9 @@ export default {
         if (!category) {
 
             category = {
-
                 title: categoryTitle,
-
                 icon: "🎬",
-
                 episodes: []
-
             };
 
             library.categories.push(category);
@@ -69,98 +49,30 @@ export default {
 
         category.episodes.push({
 
-            title: this.fileTitle(file.name),
+            title: file.title || file.name,
 
-            path: file.path
+            path: file.path || file.file || ""
 
         });
 
-        await this.save();
-
-    },
-
-    async removeMusic(index) {
-
-        library.music.splice(index, 1);
-
-        await this.save();
-
-    },
-
-    async removeVideo(categoryTitle, episodeIndex) {
-
-        const category = library.categories.find(
-            c => c.title === categoryTitle
-        );
-
-        if (!category)
-            return;
-
-        category.episodes.splice(
-            episodeIndex,
-            1
-        );
-
-        if (category.episodes.length === 0) {
-
-            library.categories =
-                library.categories.filter(
-                    c => c.title !== categoryTitle
-                );
-
-        }
-
-        await this.save();
-
-    },
-
-    async renameCategory(oldName, newName) {
-
-        const category = library.categories.find(
-            c => c.title === oldName
-        );
-
-        if (!category)
-            return;
-
-        category.title = newName;
-
-        await this.save();
-
-    },
-
-    async setCategoryIcon(title, icon) {
-
-        const category = library.categories.find(
-            c => c.title === title
-        );
-
-        if (!category)
-            return;
-
-        category.icon = icon;
-
-        await this.save();
-
-    },
-
-    getLibrary() {
-
-        return library;
-
-    },
-
-    fileTitle(name) {
-
-        const i = name.lastIndexOf(".");
-
-        if (i === -1)
-            return name;
-
-        return name.substring(0, i)
-            .replace(/_/g, " ")
-            .trim();
+        await this.saveLibrary(library);
 
     }
 
-};
+    static async addMusic(file) {
+
+        const library = await this.loadLibrary();
+
+        library.music.push({
+
+            title: file.title || file.name,
+
+            path: file.path || file.file || ""
+
+        });
+
+        await this.saveLibrary(library);
+
+    }
+
+}

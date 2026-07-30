@@ -1,73 +1,35 @@
-export default {
+const MANIFEST_URL =
+"https://raw.githubusercontent.com/cheh2019oleg-cloud/nadiyka-library-cloud/v2-cloud/cloud/manifest.json";
 
-    manifest: null,
+export default class Manifest{
 
-    async load() {
+    static async load(){
 
-        if (this.manifest) {
-            return this.manifest;
-        }
+        try{
 
-        try {
+            const r=await fetch(MANIFEST_URL,{
+                cache:"no-cache"
+            });
 
-            const response = await fetch("manifest.json");
+            if(!r.ok)
+                throw new Error("manifest");
 
-            if (!response.ok) {
-                throw new Error("manifest.json не знайдено");
-            }
-
-            this.manifest = await response.json();
-
-            return this.manifest;
+            return await r.json();
 
         }
-        catch (e) {
 
-            console.warn("Manifest:", e);
+        catch(e){
 
-            this.manifest = {
-                version: 1,
-                videos: [],
-                music: [],
-                covers: []
+            console.error(e);
+
+            return{
+                version:1,
+                categories:[],
+                music:[]
             };
 
-            return this.manifest;
-
         }
-
-    },
-
-    async getVersion() {
-
-        const m = await this.load();
-
-        return m.version || 1;
-
-    },
-
-    async getVideos() {
-
-        const m = await this.load();
-
-        return m.videos || [];
-
-    },
-
-    async getMusic() {
-
-        const m = await this.load();
-
-        return m.music || [];
-
-    },
-
-    async getCovers() {
-
-        const m = await this.load();
-
-        return m.covers || [];
 
     }
 
-};
+}

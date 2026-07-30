@@ -1,111 +1,52 @@
-export default {
+const KEY_PREFIX = "nadiyka_";
 
-    async init() {
+export default class Storage {
 
-        this.preferences =
-            window.Capacitor?.Plugins?.Preferences;
+    static async init() {
 
-    },
+        return true;
 
-    async loadResume() {
+    }
+
+    static async get(key) {
 
         try {
 
-            const r = await this.preferences.get({
-                key: "resumeMap"
-            });
+            const value = localStorage.getItem(KEY_PREFIX + key);
 
-            return r.value
-                ? JSON.parse(r.value)
-                : {};
+            return value ? JSON.parse(value) : null;
 
         }
 
         catch {
 
-            return {};
+            return null;
 
         }
 
-    },
+    }
 
-    async saveResume(map) {
+    static async set(key, value) {
 
-        try {
+        localStorage.setItem(
 
-            await this.preferences.set({
+            KEY_PREFIX + key,
 
-                key: "resumeMap",
+            JSON.stringify(value)
 
-                value: JSON.stringify(map)
+        );
 
-            });
+    }
 
-        }
+    static async loadResume() {
 
-        catch(e){
+        return await this.get("resume") || {};
 
-            console.error(e);
+    }
 
-        }
+    static async saveResume(data) {
 
-    },
-
-    async saveLibrary(library){
-
-        try{
-
-            await this.preferences.set({
-
-                key:"library",
-
-                value:JSON.stringify(library)
-
-            });
-
-        }
-
-        catch(e){
-
-            console.error(e);
-
-        }
-
-    },
-
-    async loadLibrary(){
-
-        try{
-
-            const r=await this.preferences.get({
-
-                key:"library"
-
-            });
-
-            return r.value
-                ? JSON.parse(r.value)
-                : {
-
-                    categories:[],
-
-                    music:[]
-
-                };
-
-        }
-
-        catch{
-
-            return{
-
-                categories:[],
-
-                music:[]
-
-            };
-
-        }
+        await this.set("resume", data);
 
     }
 
