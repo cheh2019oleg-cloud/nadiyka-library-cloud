@@ -1,74 +1,140 @@
+$ErrorActionPreference = "Stop"
+
 Write-Host ""
-Write-Host "===== NADIYKA LIBRARY PUBLISHER ====="
+Write-Host "===== NADIYKA LIBRARY PUBLISHER =====" -ForegroundColor Cyan
 Write-Host ""
 
-$cloudFolder = ".\cloud"
-$videoFolder = ".\www\media\video"
-$musicFolder = ".\www\media\music"
+# ----------------------------------------------------
+# FIND LIBRARY
+# ----------------------------------------------------
 
-$manifest = @{
-    version = 3
-    updated = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-    categories = @()
-    music = @()
-    files = @()
+$LibraryRoot = Get-ChildItem "H:\" -Directory -Recurse |
+    Where-Object {
+        (Test-Path (Join-Path $_.FullName "cartoons")) -and
+        (Test-Path (Join-Path $_.FullName "music")) -and
+        (Test-Path (Join-Path $_.FullName "system"))
+    } |
+    Select-Object -ExpandProperty FullName -First 1
+
+if (-not $LibraryRoot) {
+    throw "Library folder not found."
 }
 
-if(Test-Path $videoFolder){
+$Cartoons = Join-Path $LibraryRoot "cartoons"
+$Music     = Join-Path $LibraryRoot "music"
+$System    = Join-Path $LibraryRoot "system"
 
-    Get-ChildItem $videoFolder -Directory | ForEach-Object{
+$RepoRoot = (Resolve-Path "$PSScriptRoot\..").Path
+$RepoManifest = Join-Path $RepoRoot "cloud\manifest.json"
 
-        $category=@{
-            title=$_.Name
-            icon="🎬"
-            episodes=@()
+# ----------------------------------------------------
+# MANIFEST
+# ----------------------------------------------------
+
+$manifest = [ordered]@{
+    version   = 1
+    updated   = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    cartoons  = @()
+    music     = @()
+}
+
+# ----------------------------------------------------
+# CARTOONS
+# ----------------------------------------------------
+
+if (Test-Path $Cartoons) {
+
+    Get-ChildItem $Cartoons -Directory |
+    Sort-Object Name |
+    ForEach-Object {
+
+        $cat = [ordered]@{
+            title = $_.Name
+            files = @()
         }
 
-        Get-ChildItem $_.FullName -File | ForEach-Object{
+        Get-ChildItem $_.FullName -File |
+        Sort-Object Name |
+        ForEach-Object {
 
-            $episode=@{
-                title=$_.BaseName
-                file="media/video/$($_.Directory.Name)/$($_.Name)"
+            $cat.files += [ordered]@{
+                title    = $_.BaseName
+                file     = $_.Name
+                size     = $_.Length
+                modified = $_.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
             }
 
-            $category.episodes += $episode
-
-            $manifest.files += $episode.file
-
         }
 
-        $manifest.categories += $category
+        $manifest.cartoons += $cat
+    }
+}
+
+# ----------------------------------------------------
+# MUSIC
+# ----------------------------------------------------
+
+if (Test-Path $Music) {
+
+    Get-ChildItem $Music -File |
+    Sort-Object Name |
+    ForEach-Object {
+
+        $manifest.music += [ordered]@{
+            title    = $_.BaseName
+            file     = $_.Name
+            size     = $_.Length
+            modified = $_.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+        }
 
     }
+}
+
+# ----------------------------------------------------
+# VERSION
+# ----------------------------------------------------
+
+$OldVersion = 0
+
+$ManifestFile = Join-Path $System "manifest.json"
+
+if (Test-Path $ManifestFile) {
+
+    try {
+
+        $old = Get-Content $ManifestFile -Raw | ConvertFrom-Json
+        $OldVersion = [int]$old.version
+
+    }
+    catch { }
 
 }
 
-if(Test-Path $musicFolder){
+$manifest.version = $OldVersion + 1
 
-    Get-ChildItem $musicFolder -File | ForEach-Object{
+# ----------------------------------------------------
+# SAVE
+# ----------------------------------------------------
 
-        $song=@{
+$json = $manifest | ConvertTo-Json -Depth 20
 
-            title=$_.BaseName
+$json | Set-Content $ManifestFile -Encoding UTF8
+$json | Set-Content $RepoManifest -Encoding UTF8
 
-            file="media/music/$($_.Name)"
+Write-Host ""
+Write-Host "Manifest generated." -ForegroundColor Green
 
-        }
+# ----------------------------------------------------
+# GIT
+# ----------------------------------------------------
 
-        $manifest.music += $song
-
-        $manifest.files += $song.file
-
-    }
-
-}
-
-$manifest | ConvertTo-Json -Depth 20 | Set-Content "$cloudFolder\manifest.json" -Encoding UTF8
+Set-Location $RepoRoot
 
 git add .
-git commit -m "Library updated"
+
+git commit -m "Library update v$($manifest.version)"
+
 git push origin v2-cloud
 
 Write-Host ""
-Write-Host "DONE"
-Write-Host ""
+Write-Host "DONE" -ForegroundColor Green
