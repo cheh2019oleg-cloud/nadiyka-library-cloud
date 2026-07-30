@@ -1,13 +1,13 @@
-{
-  "version": 2,
-  "updated": "2026-07-30T09:00:00Z",
-  "categories": [
-    {
-      "title": "Мультфільми",
-      "icon": "🎬",
-      "episodes": []
-    }
-  ],
-  "music": [],
-  "files": []
+﻿{
+    "categories":  [
+
+                   ],
+    "music":  [
+
+              ],
+    "files":  [
+
+              ],
+    "version":  2,
+    "updated":  "2026-07-30 13:17:08"
 }
